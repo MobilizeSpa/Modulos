@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   <!-- <odoo>
+&lt;!&ndash;        <template id="web_consultant.new_homepage" inherit_id="website.homepage">
+            <xpath expr="//div[@id='wrap']" position="after">
+                <t t-if="not request.website.is_public_user()">
+                    <div class="pull-right" name="shop_acces">
+
+                        <a role="button" href="/shop" class="btn btn-primary">
+                            <span class="">Acceder a la tienda</span>
+                        </a>
+                        <a role="button" class="btn btn-primary"
+                            href="/code_sale"
+                           id="o_shop_code">
+                            <span style="color: #FFFFFF;" class="o_default_snippet_text">Compre por código</span>
+                        </a>
+                    </div>
+                </t>
+            </xpath>
+        </template>&ndash;&gt;
+    </odoo>-->
+
+<!--    <template id="portal_consultant_home" name="Mi Portal" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[@id='oe_structure_portal_my_home_2'][position()=1]" position="inside">
+            <div class="pull-right" name="shop_acces">
+
+                <a role="button" href="/shop" class="btn btn-primary">
+                    <span class="">Acceder a la tienda</span>
+                </a>
+
+                <a role="button" href="/code_sale" class="btn btn-primary"
+                   id="o_shop_code">
+                    <span style="color: #FFFFFF;" class="o_default_snippet_text">Compre por código</span>
+                </a>
+            </div>
+        </xpath>
+    </template>-->
+
+    <template id="product_consultant" inherit_id="website_sale.product">
+        <xpath expr="//a[@id='add_to_cart']" position="replace">
+            <t t-if="request.website.is_public_user()">
+                <a id="add_to_cart" type="hidden"/>
+            </t>
+            <t t-else="">
+                <a role="button" id="add_to_cart" class="btn btn-primary btn-lg mt8 js_check_product a-submit" href="#">
+                    Añadir al carrito
+                </a>
+            </t>
+        </xpath>
+        <xpath expr="//div[@class='css_quantity input-group oe_website_spinner']" position="replace">
+            <t t-if="request.website.is_public_user()">
+                <div class="css_quantity input-group oe_website_spinner" type="hidden"/>
+            </t>
+            <t t-else="">
+                <div class="css_quantity input-group oe_website_spinner" contenteditable="false">
+                    <div class="input-group-prepend">
+                        <a t-attf-href="#" class="btn btn-secondary js_add_cart_json" aria-label="Remove one"
+                           title="Remove one">
+                            <i class="fa fa-minus"></i>
+                        </a>
+                    </div>
+                    <input type="text" class="form-control quantity" data-min="1" name="add_qty"
+                           t-att-value="add_qty or 1"/>
+                    <div class="input-group-append">
+                        <a t-attf-href="#" class="btn btn-secondary float_left js_add_cart_json" aria-label="Add one"
+                           title="Add one">
+                            <i class="fa fa-plus"></i>
+                        </a>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

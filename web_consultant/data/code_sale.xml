@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="code_sale" model="website.menu">
+            <field name="name">Venta por codigo</field>
+            <field name="url">/code_sale</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence" type="int">20</field>
+        </record>
+
+        <!-- /shop product listing -->
+
+    </data>
+</odoo>
