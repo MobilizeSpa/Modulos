@@ -86,6 +86,14 @@ class WebsiteSale(ProductConfiguratorController):
             order.mapped('order_line').filtered(lambda l: l.id == int(post.get('line_id_cons', False))).unlink()
         return request.render('web_consultant.code_sale_c', values)
 
+    @http.route([
+        '''/shop''',
+        '''/shop/page/<int:page>''',
+        '''/shop/category/<model("product.public.category", "[('website_id', 'in', (False, current_website_id))]"):category>''',
+        '''/shop/category/<model("product.public.category", "[('website_id', 'in', (False, current_website_id))]"):category>/page/<int:page>'''
+    ], type='http', auth="user", website=True)
+    def shop(self, page=0, category=None, search='', ppg=False, **post):
+        return super(WebsiteSale, self).shop(page, category, search, post)
 
 
 
