@@ -6,7 +6,7 @@
     'version': '1.0',
     'category': 'Website',
     'author': 'Mobilize',
-    'depends': ['web', 'website_sale'],
+    'depends': ['web', 'website_sale', 'website_sale_coupon'],
     'data': [
         'views/code_sale.xml',
         'views/home_page.xml',
