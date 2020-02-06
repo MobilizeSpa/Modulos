@@ -6,6 +6,7 @@ from odoo import api, fields, models, _
 
 from odoo import api, fields, models, _
 from odoo.tools.safe_eval import safe_eval
+from datetime import datetime
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order'
@@ -19,10 +20,25 @@ class SaleOrderLine(models.Model):
             ('reward_type', '=', 'product'),
             ('rule_products_domain', '!=', False),
             ('reward_product_id', '!=', False),
-            '|', ('rule_min_quantity', '=', product_uom_qty),
+            '|', ('rule_min_quantity', '<=', product_uom_qty),
             ('rule_minimum_amount', '=', price_unit),
+            ('promo_code_usage', 'in',(False,'no_code_needed')),
         ])
+        now = datetime.now()
+        date_programs = self.env['sale.coupon.program']
+        for program in programs:
+            if not program.rule_date_from and not program.rule_date_to:
+                date_programs |= program
+            if program.rule_date_from and program.rule_date_to and now > program.rule_date_from and now < program.rule_date_to:
+                date_programs |= program
+            if not program.rule_date_to and (program.rule_date_from and now > program.rule_date_from):
+                date_programs |= program
+            if not program.rule_date_from and (program.rule_date_to and now < program.rule_date_to):
+                date_programs |= program
+        programs = date_programs
         program_ids = self.env['sale.coupon.program']
+        if isinstance(product_id, int):
+            product_id = self.env['product.product'].browse(product_id)
         for program_id in programs:
             domain = safe_eval(program_id.rule_products_domain)
             if (product_id.search(domain) & product_id):
@@ -50,14 +66,13 @@ class SaleOrderLine(models.Model):
                             'name': program_id.reward_product_id.name,
                             'product_uom': program_id.reward_product_id.uom_id.id,
                         }))
-                        if program_id.promo_code_usage == 'no_code_needed' or program_id.program_type == 'coupon_program':
-                            vals['order_line'].append((0, 0, {
-                                'product_uom_qty': program_id.reward_product_quantity,
-                                'price_unit': - program_id.reward_product_id.lst_price,
-                                'product_id': program_id.discount_line_product_id.id,
-                                'name': program_id.reward_product_id.name,
-                                'product_uom': program_id.reward_product_id.uom_id.id,
-                            }))
+                        vals['order_line'].append((0, 0, {
+                            'product_uom_qty': program_id.reward_product_quantity,
+                            'price_unit': - program_id.reward_product_id.lst_price,
+                            'product_id': program_id.discount_line_product_id.id,
+                            'name': program_id.reward_product_id.name,
+                            'product_uom': program_id.reward_product_id.uom_id.id,
+                        }))
         order_ids = super(SaleOrderLine, self).create(vals)
         order_ids.recompute_coupon_lines()
         return order_ids
@@ -107,6 +122,7 @@ class SaleOrderLine(models.Model):
                                 'product_id': program_id.discount_line_product_id.id,
                                 'name': program_id.reward_product_id.name,
                                 'product_uom': program_id.reward_product_id.uom_id.id,
+                                'is_reward_line': True
                             }))
         result = super(SaleOrderLine, self).write(vals)
         return result
