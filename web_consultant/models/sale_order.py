@@ -7,6 +7,11 @@ from odoo import api, fields, models, _
 from odoo import api, fields, models, _
 from odoo.tools.safe_eval import safe_eval
 from datetime import datetime
+from odoo.exceptions import UserError, ValidationError
+from odoo.http import request
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order'
@@ -44,9 +49,6 @@ class SaleOrderLine(models.Model):
             if (product_id.search(domain) & product_id):
                 program_ids |= program_id
         return program_ids
-
-
-
         
     @api.model
     def create(self, vals):
@@ -126,3 +128,5 @@ class SaleOrderLine(models.Model):
                             }))
         result = super(SaleOrderLine, self).write(vals)
         return result
+
+

@@ -95,28 +95,7 @@ class WebsiteSale(ProductConfiguratorController):
     def shop(self, page=0, category=None, search='', ppg=False, **post):
         return super(WebsiteSale, self).shop(page, category, search, post)
 
-    @http.route(['/shop/payment'], type='http', auth="public", website=True, sitemap=False)
-    def payment(self, **post):
-        """ Payment step. This page proposes several payment means based on available
-        payment.acquirer. State at this point :
 
-         - a draft sales order with lines; otherwise, clean context / session and
-           back to the shop
-         - no transaction in context / session, or only a draft one, if the customer
-           did go to a payment.acquirer website but closed the tab without
-           paying / canceling
-        """
-        order = request.website.sale_get_order()
-        for line_id in order.mapped('order_line'):
-                product_id = line_id.product_id
-                program_ids = request.env['sale.coupon.program'].search([
-                    ('discount_line_product_id', '=', product_id.id)
-                ])
-                product_sale_program_ids = (line_id.order_id.mapped('order_line.product_id') &
-                                            program_ids.mapped('reward_product_id'))
-                if product_sale_program_ids:
-                    price_unit = line_id.order_id.mapped('order_line').filtered(
-                        lambda l: l.product_id == product_sale_program_ids[:1]).price_unit
-                    # price_unit = (line_id.mapped('order_id.order_line.product_id') & product_sale_program_ids[:1]).price_unit
-                    line_id.write({'price_unit': - price_unit})
-        return super(WebsiteSale, self).payment()
+
+
+
