@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_layout_consultant" inherit_id="portal.portal_layout">
+        <xpath expr="//div[@class='o_portal_my_details']" position="inside">
+            <div style="font-size: 13px;">
+                <strong>Credito autorizado:</strong>
+                <span t-field="user_id.partner_id.auth_credit"/>
+            </div>
+            <div style="font-size: 13px;">
+                <strong>Credito disponible:</strong>
+                <span t-field="user_id.partner_id.available_credit"/>
+            </div>
+            <div style="font-size: 13px;">
+                <strong>Credito utilizado:</strong>
+                <span t-field="user_id.partner_id.used_credit"/>
+            </div>
+            <div style="font-size: 13px;">
+                <strong>Deuda vencida:</strong>
+                <span t-field="user_id.partner_id.expired_debt"/>
+            </div>
+        </xpath>
+    </template>
+</odoo>
