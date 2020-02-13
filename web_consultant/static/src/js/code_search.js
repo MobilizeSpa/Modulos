@@ -62,7 +62,7 @@ odoo.define('web_cosultant.code_search', function (require) {
                 },
 
             }).done(function (data) {
-                location.reload();
+                window.location.href = '/code_sale';
             });
 
             });
