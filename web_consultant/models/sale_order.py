@@ -53,28 +53,29 @@ class SaleOrderLine(models.Model):
     @api.model
     def create(self, vals):
         order_lines = vals.get('order_line', False)
-        for line in order_lines:
-                line = line[2]
-                product_id = self.env['product.product'].browse(line.get('product_id', False))
-                program_ids = self.authomatic_valid_program_p(product_id,
-                                                              line.get('product_uom_qty', 1),
-                                                              line.get('price_unit', 0))
-                if program_ids:
-                    for program_id in program_ids:
-                        vals['order_line'].append((0, 0, {
-                            'product_uom_qty': program_id.reward_product_quantity,
-                            'price_unit': program_id.reward_product_id.lst_price,
-                            'product_id': program_id.reward_product_id.id,
-                            'name': program_id.reward_product_id.name,
-                            'product_uom': program_id.reward_product_id.uom_id.id,
-                        }))
-                        vals['order_line'].append((0, 0, {
-                            'product_uom_qty': program_id.reward_product_quantity,
-                            'price_unit': - program_id.reward_product_id.lst_price,
-                            'product_id': program_id.discount_line_product_id.id,
-                            'name': program_id.reward_product_id.name,
-                            'product_uom': program_id.reward_product_id.uom_id.id,
-                        }))
+        if order_lines:
+            for line in order_lines:
+                    line = line[2]
+                    product_id = self.env['product.product'].browse(line.get('product_id', False))
+                    program_ids = self.authomatic_valid_program_p(product_id,
+                                                                  line.get('product_uom_qty', 1),
+                                                                  line.get('price_unit', 0))
+                    if program_ids:
+                        for program_id in program_ids:
+                            vals['order_line'].append((0, 0, {
+                                'product_uom_qty': program_id.reward_product_quantity,
+                                'price_unit': program_id.reward_product_id.lst_price,
+                                'product_id': program_id.reward_product_id.id,
+                                'name': program_id.reward_product_id.name,
+                                'product_uom': program_id.reward_product_id.uom_id.id,
+                            }))
+                            vals['order_line'].append((0, 0, {
+                                'product_uom_qty': program_id.reward_product_quantity,
+                                'price_unit': - program_id.reward_product_id.lst_price,
+                                'product_id': program_id.discount_line_product_id.id,
+                                'name': program_id.reward_product_id.name,
+                                'product_uom': program_id.reward_product_id.uom_id.id,
+                            }))
         order_ids = super(SaleOrderLine, self).create(vals)
         order_ids.recompute_coupon_lines()
         return order_ids

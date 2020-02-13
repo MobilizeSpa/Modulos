@@ -79,6 +79,7 @@ class WebsiteSale(ProductConfiguratorController):
             if not request.env.context.get('pricelist'):
                 _order = order.with_context(pricelist=order.pricelist_id.id)
             values['suggested_products'] = _order._cart_accessories()
+            order.recompute_coupon_lines()
         if not products and search != '':
             found = 0
         values.update({'found': found,})
@@ -120,3 +121,32 @@ class WebsiteSale(ProductConfiguratorController):
                     # price_unit = (line_id.mapped('order_id.order_line.product_id') & product_sale_program_ids[:1]).price_unit
                     line_id.write({'price_unit': - price_unit})
         return super(WebsiteSale, self).payment()
+
+    @http.route(['/shop/cart'], type='http', auth="public", website=True)
+    def cart(self, **post):
+        order = request.website.sale_get_order()
+        self.find_program(order)
+        return super(WebsiteSale, self).cart(**post)
+
+
+    def find_program(self, order):
+        if order.order_line:
+            order_lines = order.order_line
+            for line in order_lines:
+                program_ids = order.authomatic_valid_program_p(line.product_id,
+                                                              line.product_uom_qty,
+                                                              line.price_unit)
+                if program_ids and not any(line.website_change for line in order.mapped('order_line')):
+                    if not any(line.product_id == program_ids.reward_product_id for line in order.mapped('order_line')):
+                        for program_id in program_ids:
+                            line.website_change = True
+                            line.sudo().create(
+                                {
+                                    'product_uom_qty': program_id.reward_product_quantity,
+                                    'price_unit': program_id.reward_product_id.lst_price,
+                                    'product_id': program_id.reward_product_id.id,
+                                    'name': program_id.reward_product_id.name,
+                                    'product_uom': program_id.reward_product_id.uom_id.id,
+                                    'order_id':order.id,
+                                }
+                            )
