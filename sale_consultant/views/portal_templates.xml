@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="portal_layout_consultant" inherit_id="portal.portal_layout">
-        <xpath expr="//div[@class='o_portal_my_details']" position="inside">
+        <xpath expr="//div[@class='o_portal_my_details']/div[@t-field='user_id.partner_id']" position="before">
             <div style="font-size: 13px;">
                 <strong>Credito autorizado:</strong>
                 <span t-field="user_id.partner_id.auth_credit"/>
