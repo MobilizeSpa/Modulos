@@ -1,23 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="portal_layout_consultant" inherit_id="portal.portal_layout">
-        <xpath expr="//div[@class='o_portal_my_details']/div[@t-field='user_id.partner_id']" position="before">
-            <div style="font-size: 13px;">
-                <strong>Credito autorizado:</strong>
-                <span t-field="user_id.partner_id.auth_credit"/>
-            </div>
-            <div style="font-size: 13px;">
-                <strong>Credito disponible:</strong>
-                <span t-field="user_id.partner_id.available_credit"/>
-            </div>
-            <div style="font-size: 13px;">
-                <strong>Credito utilizado:</strong>
-                <span t-field="user_id.partner_id.used_credit"/>
-            </div>
-            <div style="font-size: 13px;">
-                <strong>Deuda vencida:</strong>
-                <span t-field="user_id.partner_id.expired_debt"/>
-            </div>
+        <xpath expr="//div[@class='o_portal_my_details']/div[@t-field='user_id.partner_id']" position="replace">
+            <div t-field="user_id.partner_id"
+                 t-options='{"widget": "contact",
+                  "fields": ["email",
+                             "phone",
+                             "address",
+                             "name",
+                             "auth_credit",
+                             "available_credit",
+                             "used_credit",
+                             "expired_debt"
+                             ]}'/>
         </xpath>
     </template>
+
+
+    <template id="contact" inherit_id="base.contact">
+    <xpath expr="//address/div[@itemprop='address']" position="before">
+        <t t-if="'auth_credit' in fields">
+            <br/>
+            <div itemprop="auth_credit" style="font-size: 13px;">
+                <strong>Credito autorizado:</strong>
+                <span t-field="object.auth_credit"/>
+            </div>
+        </t>
+        <t t-if="'available_credit' in fields">
+
+            <div itemprop="available_credit" style="font-size: 13px;">
+                <strong>Credito disponible:</strong>
+                <span t-field="object.available_credit"/>
+            </div>
+        </t>
+        <t t-if="'used_credit' in fields">
+
+            <div itemprop="used_credit" style="font-size: 13px;">
+                <strong>Credito utilizado:</strong>
+                <span t-field="object.used_credit"/>
+            </div>
+        </t>
+        <t t-if="'expired_debt' in fields">
+
+            <div itemprop="expired_debt" style="font-size: 13px;">
+                <strong>Deuda vencida:</strong>
+                <span t-field="object.expired_debt"/>
+            </div>
+            <br/>
+        </t>
+    </xpath>
+</template>
+
 </odoo>
