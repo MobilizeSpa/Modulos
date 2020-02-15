@@ -14,9 +14,8 @@ class WebsiteSale(ProductConfiguratorController):
         values = {}
         if post.get('search_code', False):
             search = ''
-        else:
-            search = search.upper()
-        products = search != '' and request.env['product.product'].search([('default_code', '=', search)])[:1] or request.env.get('product.product')
+        products = search != '' and request.env['product.product'].search([('default_code', 'ilike', search)])[:1] or request.env.get('product.product')
+        products = products.filtered(lambda p: p.default_code.upper() == search.upper())
         if order and order.state != 'draft':
             request.session['sale_order_id'] = None
             order = request.website.sale_get_order()
