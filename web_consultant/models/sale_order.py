@@ -13,7 +13,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-class SaleOrderLine(models.Model):
+class SaleOrder(models.Model):
     _inherit = 'sale.order'
     _order = 'id,create_date DESC'
 
@@ -127,7 +127,23 @@ class SaleOrderLine(models.Model):
                                 'product_uom': program_id.reward_product_id.uom_id.id,
                                 'is_reward_line': True
                             }))
-        result = super(SaleOrderLine, self).write(vals)
+        result = super(SaleOrder, self).write(vals)
         return result
+
+    @api.multi
+    def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, **kwargs):
+        if line_id and product_id and set_qty == 0 and not add_qty:
+            self.ensure_one()
+            line = self.env['sale.order.line'].browse(line_id)
+            programs = self.authomatic_valid_program_p(
+                                                        product_id,
+                                                        line.product_uom_qty,
+                                                        line.price_unit)
+            if programs:
+                line_rwrd = self.mapped('order_line').filtered(
+                    lambda l: l.product_id in programs.mapped('reward_product_id'))
+                line_rwrd.unlink()
+        res = super(SaleOrder, self)._cart_update(product_id=product_id, line_id=line_id, add_qty=add_qty, set_qty=set_qty, **kwargs)
+        return res
 
 

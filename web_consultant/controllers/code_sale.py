@@ -78,12 +78,20 @@ class WebsiteSale(ProductConfiguratorController):
             if not request.env.context.get('pricelist'):
                 _order = order.with_context(pricelist=order.pricelist_id.id)
             values['suggested_products'] = _order._cart_accessories()
-            order.recompute_coupon_lines()
         if not products and search != '':
             found = 0
         values.update({'found': found,})
         if post.get('line_id_cons', False):
-            order.mapped('order_line').filtered(lambda l: l.id == int(post.get('line_id_cons', False))).unlink()
+            line = order.mapped('order_line').filtered(lambda l: l.id == int(post.get('line_id_cons', False)))
+            programs = order.authomatic_valid_program_p(line[:1].product_id,
+                                                              line[:1].product_uom_qty,
+                                                              line[:1].price_unit)
+            if programs:
+                line_rwrd = order.mapped('order_line').filtered(lambda l: l.product_id in programs.mapped('reward_product_id'))
+                line_rwrd.unlink()
+            line.unlink()
+        if order:
+            order.recompute_coupon_lines()
         return request.render('web_consultant.code_sale_c', values)
 
     @http.route([
