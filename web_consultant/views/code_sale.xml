@@ -47,8 +47,13 @@
                         </td>
                         <td class="text-center td-qty">
                             <div t-if="not line.linked_line_id" class="css_quantity input-group mx-auto oe_website_spinner">
-                                <div class="input-group-prepend">
-                                    <a  id="consultant_minus" t-attf-href="#" class="btn btn-link js_add_cart_json d-none d-md-inline-block" aria-label="Remove one" title="Remove one">
+                                <t t-if="not line.is_reward_line">
+                                  <div class="input-group-prepend">
+                                    <a  id="consultant_minus"
+                                        t-attf-href="#"
+                                        class="btn btn-link js_add_cart_json d-none d-md-inline-block"
+                                        aria-label="Remove one"
+                                        title="Remove one">
                                         <i class="fa fa-minus"></i>
                                     </a>
                                 </div>
@@ -58,6 +63,36 @@
                                         <i class="fa fa-plus"></i>
                                     </a>
                                 </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="input-group-prepend">
+                                    <a  id="rwrd_minus"
+                                        t-attf-href="#"
+                                        class="btn d-none d-md-inline-block"
+                                        aria-label="Remove one"
+                                        title="Remove one"
+                                    readonly="1">
+                                        <i class="fa fa-minus"></i>
+                                    </a>
+                                </div>
+                                <input id="'qty_consult_order_%s' % line.product_id.id"
+                                       type="text"
+                                       class="js_quantity form-control quantity"
+                                       t-att-data-line-id="line.id"
+                                       t-att-data-product-id="line.product_id.id"
+                                       t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty"
+                                       readonly="1"
+                                />
+                                    <div class="input-group-append">
+                                    <a id="rwrd_plus"
+                                       t-attf-href="#"
+                                       class="btn d-none d-md-inline-block"
+                                       aria-label="Add one" title="Add one">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </div>
+                                </t>
+
                             </div>
                             <t t-if="line.linked_line_id">
                               <span class="js_quantity text-muted" t-att-data-line-id="line.id" t-att-data-product-id="line.product_id.id" t-esc="int(line.product_uom_qty)"/>
